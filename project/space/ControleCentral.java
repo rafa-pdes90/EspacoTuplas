@@ -26,16 +26,15 @@ public class ControleCentral {
                 System.out.println("3 - Criar dispositivo");
                 System.out.println("4 - Destruir dispositivo");
                 System.out.println("5 - Mover dispositivo");
-                System.out.println("6 - Mover usuario");
-                System.out.println("7 - Listar todos os ambientes existentes");
-                System.out.println("8 - Listar todos os dispositivos de um ambiente");
-                System.out.println("9 - Lista todos os usuarios em um ambiente");
+                System.out.println("6 - Listar todos os ambientes existentes");
+                System.out.println("7 - Listar todos os dispositivos de um ambiente");
+                System.out.println("8 - Lista todos os usuarios em um ambiente");
                 
                 System.out.println("\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
                 System.out.print("Entre com a opcao desejada (ou ENTER para sair): ");
                 String opcao = scanner.nextLine();
                 if (opcao == null || opcao.equals("")) {
-                    System.exit(0);
+                    break;
                 }
                 else {
                     pausar = true;
@@ -255,7 +254,7 @@ public class ControleCentral {
                             moviveis.clear();
                             break;
                         }
-
+                        /*
                         case "6":
                         {
                             List<User> listaUser = Helpers.listaUsuario(space);
@@ -334,8 +333,8 @@ public class ControleCentral {
                             moviveis.clear();
                             break;
                         }
-
-                        case "7":
+                        */
+                        case "6":
                         {
                             List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             if (listaAmb.size() == 0) {
@@ -352,7 +351,7 @@ public class ControleCentral {
                             break;
                         }
 
-                        case "8":
+                        case "7":
                         {
                             List<Dispositivo> listaNullDisp = Helpers.listaDispositivo(space, null);
                             if (listaNullDisp.size() > 0) {
@@ -410,7 +409,7 @@ public class ControleCentral {
                             break;
                         }
 
-                        case "9":
+                        case "8":
                         {
                             List<User> listaNullUser = Helpers.listaUsuario(space, null);
                             if (listaNullUser.size() > 0) {
