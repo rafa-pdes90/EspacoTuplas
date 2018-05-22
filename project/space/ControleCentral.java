@@ -105,10 +105,19 @@ public class ControleCentral {
                                 pausar = false;
                             }
                             else if (destruiveis.contains(oldNome)) {
-                                Ambiente oldAmb = new Ambiente();
-                                oldAmb.nome = oldNome;
-                                space.take(oldAmb, null, JavaSpace.NO_WAIT);
-                                System.out.println("\r\nAmbiente " + oldNome + " destruido");
+                                dispTemplate.amb = oldNome;
+                                userTemplate.amb = oldNome;
+
+                                if (space.read(dispTemplate, null, JavaSpace.NO_WAIT) != null ||
+                                    space.read(userTemplate, null, JavaSpace.NO_WAIT) != null) {
+                                        System.out.println("\r\nAmbiente nao eh mais destruivel");
+                                }
+                                else {
+                                    Ambiente oldAmb = new Ambiente();
+                                    oldAmb.nome = oldNome;
+                                    space.take(oldAmb, null, JavaSpace.NO_WAIT);
+                                    System.out.println("\r\nAmbiente " + oldNome + " destruido");
+                                }
                             }
                             else {
                                 System.out.println("\r\nAmbiente invalido");
@@ -234,12 +243,26 @@ public class ControleCentral {
                                     System.out.println ("\r\nDispositivo ja esta no ambiente " + ambAtual);
                                 }
                                 else if (disponiveis.contains(novoAmb)) {
-                                    Dispositivo oldDisp = new Dispositivo();
-                                    oldDisp.nome = nome;
-                                    Dispositivo disp = (Dispositivo) space.take(oldDisp, null, JavaSpace.NO_WAIT);
-                                    disp.amb = novoAmb;
-                                    space.write(disp, null, Lease.FOREVER);
-                                    System.out.println("\r\nDispositivo " + nome + " movido para o ambiente " + novoAmb);
+                                    Ambiente ambTemplate = new Ambiente();
+                                    ambTemplate.nome = novoAmb;
+                                    
+                                    if (space.read(ambTemplate, null, JavaSpace.NO_WAIT) == null) {
+                                        System.out.println("\r\nAmbiente de destino nao existe mais");
+                                    }
+                                    else {
+                                        Dispositivo oldDisp = new Dispositivo();
+                                        oldDisp.nome = nome;
+                                        Dispositivo disp = (Dispositivo) space.take(oldDisp, null, JavaSpace.NO_WAIT);
+    
+                                        if (disp == null) {
+                                            System.out.println("\r\nDispositivo nao existe mais");
+                                        }
+                                        else {
+                                            disp.amb = novoAmb;
+                                            space.write(disp, null, Lease.FOREVER);
+                                            System.out.println("\r\nDispositivo " + nome + " movido para o ambiente " + novoAmb);
+                                        }
+                                    }
                                 }
                                 else {
                                     System.out.println("\r\nAmbiente invalido");
@@ -396,10 +419,17 @@ public class ControleCentral {
                                 List<Dispositivo> listaDisp = Helpers.listaDispositivo(space, ambNome);
                                 
                                 System.out.println("\r\nDispositivos encontrados no ambiente " + ambNome + ":");
-                                for (int i = 0; i < listaDisp.size(); i++) {
-                                    System.out.println(listaDisp.get(i).nome);
+                                
+                                if (listaDisp.size() == 0) {
+                                    System.out.println("\r\nNao ha mais dispositivos neste ambiente");
                                 }
-                                listaDisp.clear();
+                                else {
+                                    for (int i = 0; i < listaDisp.size(); i++) {
+                                        System.out.println(listaDisp.get(i).nome);
+                                    }
+
+                                    listaDisp.clear();
+                                }
                             }
                             else {
                                 System.out.println("\r\nAmbiente invalido");
@@ -454,10 +484,17 @@ public class ControleCentral {
                                 List<User> listaUser = Helpers.listaUsuario(space, ambNome);
                                 
                                 System.out.println("\r\nUsuarios encontrados no ambiente " + ambNome + ":");
-                                for (int i = 0; i < listaUser.size(); i++) {
-                                    System.out.println(listaUser.get(i).nome);
+
+                                if (listaUser.size() == 0) {
+                                    System.out.println("\r\nNao ha mais usuarios neste ambiente");
                                 }
-                                listaUser.clear();
+                                else {
+                                    for (int i = 0; i < listaUser.size(); i++) {
+                                        System.out.println(listaUser.get(i).nome);
+                                    }
+
+                                    listaUser.clear();
+                                }
                             }
                             else {
                                 System.out.println("\r\nAmbiente invalido");
