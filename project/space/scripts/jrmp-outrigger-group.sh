@@ -22,6 +22,7 @@
 set -x
 
 java -Djava.security.policy=config/policy.all \
+     -Djava.rmi.server.useCodebaseOnly=false \
      -jar ../../lib/start.jar \
      config/start-outrigger-group.config
 
