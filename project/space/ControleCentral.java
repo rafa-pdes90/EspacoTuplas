@@ -5,93 +5,6 @@ import java.util.*;
 
 public class ControleCentral {
 
-    private static List<Ambiente> listaAmbiente(JavaSpace space) throws Exception {
-        List<Ambiente> listaAmb = new ArrayList<Ambiente>();
-        Ambiente template = new Ambiente();
-        Ambiente amb;
-
-        do {
-            amb = (Ambiente) space.take(template, null, JavaSpace.NO_WAIT);
-
-            if (amb != null) {
-                listaAmb.add(amb);
-            }
-        } while (amb != null);
-
-        for (int i = 0; i < listaAmb.size(); i++) {
-            amb = listaAmb.get(i);
-            space.write(amb, null, Lease.FOREVER);
-        }
-
-        return listaAmb;
-    }
-
-    private static List<Dispositivo> listaDispositivo(JavaSpace space) throws Exception {
-        return listaDispositivo(space, "");
-    }
-
-    private static List<Dispositivo> listaDispositivo(JavaSpace space, String amb) throws Exception {
-        List<Dispositivo> listaDisp= new ArrayList<Dispositivo>();
-        Dispositivo template = new Dispositivo();
-        Dispositivo disp;
-
-        if (amb != "" ) {
-            template.amb = amb;
-        }
-
-        do {
-            disp = (Dispositivo) space.take(template, null, JavaSpace.NO_WAIT);
-
-            if (disp != null) {
-                listaDisp.add(disp);
-            }
-        } while (disp != null);
-
-        for (int i = listaDisp.size()-1; i >= 0; i--) {
-            disp = listaDisp.get(i);
-            space.write(disp, null, Lease.FOREVER);
-            
-            if (amb == null && disp.amb != null) {
-                listaDisp.remove(disp);
-            }
-        }
-        
-        return listaDisp;
-    }
-
-    private static List<User> listaUsuario(JavaSpace space) throws Exception {
-        return listaUsuario(space, "");
-    }
-
-    private static List<User> listaUsuario(JavaSpace space, String amb) throws Exception {
-        List<User> listaUser= new ArrayList<User>();
-        User template = new User();
-        User user;
-
-        if (amb != "" ) {
-            template.amb = amb;
-        }
-
-        do {
-            user = (User) space.take(template, null, JavaSpace.NO_WAIT);
-
-            if (user != null) {
-                listaUser.add(user);
-            }
-        } while (user != null);
-
-        for (int i = listaUser.size()-1; i >= 0; i--) {
-            user = listaUser.get(i);
-            space.write(user, null, Lease.FOREVER);
-
-            if (amb == null && user.amb != null) {
-                listaUser.remove(user);
-            }
-        }
-
-        return listaUser;
-    }
-
     public static void main(String[] args) {
         try {
             System.out.println("Procurando pelo servico JavaSpace...");
@@ -150,7 +63,7 @@ public class ControleCentral {
 
                         case "2":
                         {
-                            List<Ambiente> listaAmb = listaAmbiente(space);
+                            List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             if (listaAmb.size() == 0) {
                                 System.out.println("Nao ha ambientes");
                                 break;
@@ -228,7 +141,7 @@ public class ControleCentral {
 
                         case "4":
                         {
-                            List<Dispositivo> listaDisp = listaDispositivo(space);
+                            List<Dispositivo> listaDisp = Helpers.listaDispositivo(space);
                             if (listaDisp.size() == 0) {
                                 System.out.println("Nao ha dispositivos");
                                 break;
@@ -266,7 +179,7 @@ public class ControleCentral {
 
                         case "5":
                         {
-                            List<Dispositivo> listaDisp = listaDispositivo(space);
+                            List<Dispositivo> listaDisp = Helpers.listaDispositivo(space);
                             if (listaDisp.size() == 0) {
                                 System.out.println("Nao ha dispositivos");
                                 break;
@@ -289,7 +202,7 @@ public class ControleCentral {
                                 pausar = false;
                             }
                             else if (moviveis.containsKey(nome)) {
-                                List<Ambiente> listaAmb = listaAmbiente(space);
+                                List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                                 List<String> disponiveis = new ArrayList<String>();
                                 String ambAtual = moviveis.get(nome);
 
@@ -345,7 +258,7 @@ public class ControleCentral {
 
                         case "6":
                         {
-                            List<User> listaUser = listaUsuario(space);
+                            List<User> listaUser = Helpers.listaUsuario(space);
                             if (listaUser.size() == 0) {
                                 System.out.println("Nao ha usuarios");
                                 break;
@@ -368,7 +281,7 @@ public class ControleCentral {
                                 pausar = false;
                             }
                             else if (moviveis.containsKey(nome)) {
-                                List<Ambiente> listaAmb = listaAmbiente(space);
+                                List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                                 List<String> disponiveis = new ArrayList<String>();
                                 String ambAtual = moviveis.get(nome);
 
@@ -424,7 +337,7 @@ public class ControleCentral {
 
                         case "7":
                         {
-                            List<Ambiente> listaAmb = listaAmbiente(space);
+                            List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             if (listaAmb.size() == 0) {
                                 System.out.println("Nao ha ambientes");
                                 break;
@@ -441,7 +354,7 @@ public class ControleCentral {
 
                         case "8":
                         {
-                            List<Dispositivo> listaNullDisp = listaDispositivo(space, null);
+                            List<Dispositivo> listaNullDisp = Helpers.listaDispositivo(space, null);
                             if (listaNullDisp.size() > 0) {
                                 System.out.println("\r\nDispositivos sem ambiente definido:");
                                 for (int i = 0; i < listaNullDisp.size(); i++) {
@@ -450,7 +363,7 @@ public class ControleCentral {
                                 listaNullDisp.clear();
                             }
                             
-                            List<Ambiente> listaAmb = listaAmbiente(space);
+                            List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             List<String> pesquisaveis = new ArrayList<String>();
                             Dispositivo dispTemplate = new Dispositivo();
                             
@@ -481,7 +394,7 @@ public class ControleCentral {
                                 pausar = false;
                             }
                             else if (pesquisaveis.contains(ambNome)) {
-                                List<Dispositivo> listaDisp = listaDispositivo(space, ambNome);
+                                List<Dispositivo> listaDisp = Helpers.listaDispositivo(space, ambNome);
                                 
                                 System.out.println("\r\nDispositivos encontrados no ambiente " + ambNome + ":");
                                 for (int i = 0; i < listaDisp.size(); i++) {
@@ -499,7 +412,7 @@ public class ControleCentral {
 
                         case "9":
                         {
-                            List<User> listaNullUser = listaUsuario(space, null);
+                            List<User> listaNullUser = Helpers.listaUsuario(space, null);
                             if (listaNullUser.size() > 0) {
                                 System.out.println("\r\nUsuarios sem ambiente definido:");
                                 for (int i = 0; i < listaNullUser.size(); i++) {
@@ -508,7 +421,7 @@ public class ControleCentral {
                                 listaNullUser.clear();
                             }
 
-                            List<Ambiente> listaAmb = listaAmbiente(space);
+                            List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             List<String> pesquisaveis = new ArrayList<String>();
                             User userTemplate = new User();
                             
@@ -539,7 +452,7 @@ public class ControleCentral {
                                 pausar = false;
                             }
                             else if (pesquisaveis.contains(ambNome)) {
-                                List<User> listaUser = listaUsuario(space, ambNome);
+                                List<User> listaUser = Helpers.listaUsuario(space, ambNome);
                                 
                                 System.out.println("\r\nUsuarios encontrados no ambiente " + ambNome + ":");
                                 for (int i = 0; i < listaUser.size(); i++) {
@@ -570,4 +483,5 @@ public class ControleCentral {
             e.printStackTrace();
         }
     }
+
 }
