@@ -27,7 +27,7 @@ public class ControleCentral {
                 System.out.println("4 - Destruir dispositivo");
                 System.out.println("5 - Mover dispositivo");
                 System.out.println("6 - Mover usuario");
-                System.out.println("7 - Listar todos os ambientes");
+                System.out.println("7 - Listar todos os ambientes existentes");
                 System.out.println("8 - Listar todos os dispositivos de um ambiente");
                 System.out.println("9 - Lista todos os usuarios em um ambiente");
                 
