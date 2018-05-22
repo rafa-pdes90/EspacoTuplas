@@ -5,7 +5,7 @@ import java.util.*;
 
 public class BatePapo {
 
-    private static String entrarAmbiente(JavaSpace space, Scanner scanner, String nome) throws Exception {
+    private static String getAmbEntravel(JavaSpace space, Scanner scanner, String nome) throws Exception {
         List<String> listaAmb = new ArrayList<String>();
 
         do {
@@ -45,18 +45,26 @@ public class BatePapo {
                 break;
             }
             else if (listaAmb.contains(newAmb)) {
-                listaAmb.clear();
-                return newAmb;
+                Ambiente ambTemplate = new Ambiente();
+                ambTemplate.nome = newAmb;
+
+                if (space.read(ambTemplate, null, JavaSpace.NO_WAIT) == null) {
+                    System.out.println ("\r\nAmbiente nao existe mais");
+                }
+                else {
+                    listaAmb.clear();
+                    return newAmb;
+                }
             }
             else {
                 System.out.println("\r\nAmbiente invalido");
+            }
 
-                if (nome == null) {
-                    listaAmb.clear();
-                }
-                else {
-                    break;
-                }
+            if (nome == null) {
+                listaAmb.clear();
+            }
+            else {
+                break;
             }
         } while (listaAmb.size() == 0);
 
@@ -94,7 +102,7 @@ public class BatePapo {
             }
 
             System.out.println("\r\n\r\nProcurando ambientes . . .");
-            String ambAtual = entrarAmbiente(space, scanner, null);
+            String ambAtual = getAmbEntravel(space, scanner, null);
             usuario = (User) space.take(usuario, null, JavaSpace.NO_WAIT);
 
             if (ambAtual == null) {
@@ -162,6 +170,7 @@ public class BatePapo {
                                 novaMsg.time = System.currentTimeMillis();
                                 novaMsg.from = usuario.nome;
                                 novaMsg.to = nomeTo;
+                                novaMsg.amb = ambAtual;
 
                                 System.out.println("\r\nEntre com a mensagem a enviar:");
                                 novaMsg.msg = scanner.nextLine();
@@ -181,6 +190,7 @@ public class BatePapo {
                         {
                             Mensagem msgTemplate = new Mensagem();
                             msgTemplate.to = usuario.nome;
+                            msgTemplate.amb = ambAtual;
 
                             Mensagem novaMsg = (Mensagem) space.take(msgTemplate, null, JavaSpace.NO_WAIT);
 
@@ -206,7 +216,7 @@ public class BatePapo {
 
                         case "3":
                         {
-                            String novoAmb = entrarAmbiente(space, scanner, ambAtual);
+                            String novoAmb = getAmbEntravel(space, scanner, ambAtual);
 
                             if (novoAmb != null) {
                                 usuario.amb = null;

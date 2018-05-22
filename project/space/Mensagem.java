@@ -5,6 +5,7 @@ public class Mensagem implements Entry {
     public String from;
     public String to;
     public String msg;
+    public String amb;
     public Mensagem() {
     }
 }
