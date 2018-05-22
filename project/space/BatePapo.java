@@ -87,12 +87,15 @@ public class BatePapo {
                 User tempUser = (User) space.read(usuario, null, JavaSpace.NO_WAIT);
 
                 if (tempUser == null) {
+                    space.write(usuario, null, Lease.FOREVER);
+                    System.out.println("\r\nUsuario registrado como: " + usuario.nome);
                     break;
                 }
             }
 
             System.out.println("\r\n\r\nProcurando ambientes . . .");
             String ambAtual = entrarAmbiente(space, scanner, null);
+            usuario = (User) space.take(usuario, null, JavaSpace.NO_WAIT);
 
             if (ambAtual == null) {
                 System.exit(0);
@@ -100,26 +103,26 @@ public class BatePapo {
 
             usuario.amb = ambAtual;
             space.write(usuario, null, Lease.FOREVER);
-            System.out.println("\r\nUsuario registrado como: " + usuario.nome);
             System.out.println("\r\nEntrou no ambiente: " + ambAtual);
             System.out.println("\r\nPress any key to continue . . .");
             scanner.nextLine();
 
-            boolean pausar = false;
-            while (!pausar) {
+            boolean pausar;
+            while (true) {
                 System.out.println("\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
                 System.out.println("MENU");
                 System.out.println("1 - Enviar mensagem");
-                System.out.println("2 - Mudar de ambiente");
-                System.out.println("3 - Listar todos os ambientes existentes");
-                System.out.println("4 - Listar todos os dispositivos no ambiente atual");
-                System.out.println("5 - Lista todos os usuarios no ambiente atual");
+                System.out.println("1 - Receber novas mensagens");
+                System.out.println("3 - Mudar de ambiente");
+                System.out.println("4 - Listar todos os ambientes existentes");
+                System.out.println("5 - Listar todos os dispositivos no ambiente atual");
+                System.out.println("6 - Lista todos os usuarios no ambiente atual");
                 
                 System.out.println("\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
                 System.out.print("Entre com a opcao desejada (ou ENTER para sair): ");
                 String opcao = scanner.nextLine();
                 if (opcao == null || opcao.equals("")) {
-                    System.exit(0);
+                    break;
                 }
                 else {
                     pausar = true;
@@ -156,7 +159,7 @@ public class BatePapo {
                             }
                             else if (enderecaveis.contains(nomeTo)) {
                                 Mensagem novaMsg = new Mensagem();
-                                novaMsg.index = 0; // java.time.LocalDateTime.now() // System.currentTimeMillis()
+                                novaMsg.time = System.currentTimeMillis();
                                 novaMsg.from = usuario.nome;
                                 novaMsg.to = nomeTo;
 
@@ -176,10 +179,38 @@ public class BatePapo {
 
                         case "2":
                         {
+                            Mensagem msgTemplate = new Mensagem();
+                            msgTemplate.to = usuario.nome;
+
+                            Mensagem novaMsg = (Mensagem) space.take(msgTemplate, null, JavaSpace.NO_WAIT);
+
+                            if (novaMsg == null) {
+                                System.out.println("\r\nNao ha novas mensagens");
+                            }
+                            else {
+                                System.out.println();
+
+                                while (novaMsg != null) {
+                                    System.out.print("\r\n" + new Date(novaMsg.time));
+                                    System.out.println("\t - \tEnviada por: " + novaMsg.from);
+                                    System.out.println(novaMsg.msg);
+    
+                                    novaMsg = (Mensagem) space.take(msgTemplate, null, JavaSpace.NO_WAIT);
+                                }
+
+                                System.out.println();
+                            }
+
+                            break;
+                        }
+
+                        case "3":
+                        {
                             String novoAmb = entrarAmbiente(space, scanner, ambAtual);
 
                             if (novoAmb != null) {
-                                space.take(usuario, null, JavaSpace.NO_WAIT);
+                                usuario.amb = null;
+                                usuario = (User) space.take(usuario, null, JavaSpace.NO_WAIT);
                                 usuario.amb = novoAmb;
                                 space.write(usuario, null, Lease.FOREVER);
 
@@ -190,7 +221,7 @@ public class BatePapo {
                             break;
                         }
 
-                        case "3":
+                        case "4":
                         {
                             List<Ambiente> listaAmb = Helpers.listaAmbiente(space);
                             
@@ -203,7 +234,7 @@ public class BatePapo {
                             break;
                         }
 
-                        case "4":
+                        case "5":
                         {
                             List<Dispositivo> listaDisp = Helpers.listaDispositivo(space, ambAtual);
                             if (listaDisp.size() == 0) {
@@ -219,7 +250,7 @@ public class BatePapo {
                             break;
                         }
 
-                        case "5":
+                        case "6":
                         {
                             List<User> listaUser = Helpers.listaUsuario(space, ambAtual);
                                 
@@ -240,11 +271,11 @@ public class BatePapo {
                     if (pausar) {
                         System.out.println("\r\nPress any key to continue . . .");
                         scanner.nextLine();
-                        pausar = false;
                     }
                 }
             }
 
+            usuario.amb = null;
             space.take(usuario, null, JavaSpace.NO_WAIT);
         } catch (Exception e) {
             e.printStackTrace();
